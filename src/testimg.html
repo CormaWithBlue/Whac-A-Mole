@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>giftest</title>
+</head>
+
+<body>
+
+  <img id='fimg' src="./assets/mouseOnce.gif" alt="Smiley face" width="42" height="42">
+  <img id='simg' src="./assets/mouseNone.png" alt="Smiley face" width="42" height="42">
+
+</body>
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      document.getElementById('simg').src = "./assets/mouseOnce.gif"
+    }, 1000);
+  }
+
+</script>
+
+</html>
