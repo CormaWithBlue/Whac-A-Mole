@@ -6,7 +6,7 @@ import HitMouse from '@/components/HitMouse'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
+  mode: 'hash',
   routes: [{
       path: '/',
       name: 'FrontCover',
