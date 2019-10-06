@@ -1,27 +1,63 @@
 <template>
   <div class="HitMouse" id="HitMouse">
     <div id="changeMouse" class="changeMouse" @mousedown="mouseDown()" @mouseup="mouseUp()">
+      <el-button type="success" round v-on:click="gameBegin()">Start</el-button>
+
+      <el-button>hitMouseCount:{{hitMouseCount}}</el-button>
+      <el-button>missMouseCount:{{missMouseCount}}</el-button>
       <div class="mouseTop">
-        <img class="mouse" @click="hitMouse($event,0)" :src="status[0] ? mousegif[0] : mouseimg[0]" />
-        <img class="mouse" @click="hitMouse($event,1)" :src="status[1] ? mousegif[1] : mouseimg[1]" />
-        <img class="mouse" @click="hitMouse($event,2)" :src="status[2] ? mousegif[2] : mouseimg[2]" />
-        <img class="mouse" @click="hitMouse($event,3)" :src="status[3] ? mousegif[3] : mouseimg[3]" />
+        <img
+          class="mouse"
+          @click="hitMouse($event,0)"
+          :src="status[0] ? (status[0]==1?mousegif[0]:mouseHit[0]) : mouseimg[0]"
+        />
+        <img
+          class="mouse"
+          @click="hitMouse($event,1)"
+          :src="status[1] ?(status[1]==1?mousegif[1]:mouseHit[1]) : mouseimg[1]"
+        />
+        <img
+          class="mouse"
+          @click="hitMouse($event,2)"
+          :src="status[2] ? (status[2]==1?mousegif[2]:mouseHit[2]) : mouseimg[2]"
+        />
+        <img
+          class="mouse"
+          @click="hitMouse($event,3)"
+          :src="status[3] ? (status[3]==1?mousegif[3]:mouseHit[3]): mouseimg[3]"
+        />
       </div>
       <div class="mouseBottom">
-        <img class="mouse" @click="hitMouse($event,4)" :src="status[4] ? mousegif[4] : mouseimg[4]" />
-        <img class="mouse" @click="hitMouse($event,5)" :src="status[5] ? mousegif[5] : mouseimg[5]" />
-        <img class="mouse" @click="hitMouse($event,6)" :src="status[6] ? mousegif[6] : mouseimg[6]" />
-        <img class="mouse" @click="hitMouse($event,7)" :src="status[7] ? mousegif[7] : mouseimg[7]" />
+        <img
+          class="mouse"
+          @click="hitMouse($event,4)"
+          :src="status[4] ? (status[4]==1?mousegif[4]:mouseHit[4]): mouseimg[4]"
+        />
+        <img
+          class="mouse"
+          @click="hitMouse($event,5)"
+          :src="status[5] ? (status[5]==1?mousegif[5]:mouseHit[5]) : mouseimg[5]"
+        />
+        <img
+          class="mouse"
+          @click="hitMouse($event,6)"
+          :src="status[6] ? (status[6]==1?mousegif[6]:mouseHit[6]) : mouseimg[6]"
+        />
+        <img
+          class="mouse"
+          @click="hitMouse($event,7)"
+          :src="status[7] ? (status[7]==1?mousegif[7]:mouseHit[7]) : mouseimg[7]"
+        />
       </div>
     </div>
-    <p>hitMouseCount:{{hitMouseCount}}</p>
   </div>
 </template>
 
 <script>
 import Vue from "Vue";
+
 // import changeMouseA from "../assets/mouseOver.png";
-import testgif from "../assets/mouseOnce0.gif";
+
 import mouseOnce0 from "../assets/mouseOnce0.gif";
 import mouseOnce1 from "../assets/mouseOnce1.gif";
 import mouseOnce2 from "../assets/mouseOnce2.gif";
@@ -30,7 +66,17 @@ import mouseOnce4 from "../assets/mouseOnce4.gif";
 import mouseOnce5 from "../assets/mouseOnce5.gif";
 import mouseOnce6 from "../assets/mouseOnce6.gif";
 import mouseOnce7 from "../assets/mouseOnce7.gif";
+
 import mouseNone from "../assets/mouseNone.png";
+
+import mouseHit0 from "../assets/mouseHit0.gif";
+import mouseHit1 from "../assets/mouseHit1.gif";
+import mouseHit2 from "../assets/mouseHit2.gif";
+import mouseHit3 from "../assets/mouseHit3.gif";
+import mouseHit4 from "../assets/mouseHit4.gif";
+import mouseHit5 from "../assets/mouseHit5.gif";
+import mouseHit6 from "../assets/mouseHit6.gif";
+import mouseHit7 from "../assets/mouseHit7.gif";
 export default {
   name: "HitMouse",
   //status == 0: 老鼠未出现
@@ -44,18 +90,23 @@ export default {
       // 2：用户点击到了老鼠后，切换为被砸了并降落的gif
       status: [0, 0, 0, 0, 0, 0, 0, 0],
       hitMouseCount: 0,
+      missMouseCount: 0,
       mouseimg: [],
       mousegif: [],
       interval: [],
       setTimeOutMouse: [],
       mouseSum: 1,
       mouseTimeMax: 3000,
-      mouseTimeMin: 1000
+      mouseTimeMin: 1000,
+      mouseHit: [],
+      timeOut: null,
+      startGame: true
     };
   },
-  created() {
-    console.log("created");
-  },
+  // created() {
+  //   console.log("created");
+  // },
+
   mounted() {
     this.mouseimg = [
       mouseNone,
@@ -77,9 +128,31 @@ export default {
       mouseOnce6,
       mouseOnce7
     ];
-    this.mouseAppear();
+    this.mouseHit = [
+      mouseHit0,
+      mouseHit1,
+      mouseHit2,
+      mouseHit3,
+      mouseHit4,
+      mouseHit5,
+      mouseHit6,
+      mouseHit7
+    ];
+    // this.mouseAppear();
   },
   methods: {
+    // 地洞：
+    //    地洞的8个位置
+    // 老鼠：
+    //  1. 随机老鼠的位置
+    //  2. 老鼠的三种状态和动画：
+    //   （1）老鼠未出现
+    //   （2）老鼠上升到最高到下降
+    //   （3）老鼠被锤到并下降
+    //  3. 老鼠被锤到后，计数并显示
+    // 鼠标：
+    //  1.在背景图的div内就显示为锤子样式
+    //  2.点击鼠标左键时候，切换锤子样式，鼠标抬起后，换回样式
     mouseDown: function() {
       document.getElementById("changeMouse").className = "mouseDown";
       //       "url(" + changeMouseA + "),auto";
@@ -89,8 +162,13 @@ export default {
     },
     hitMouse: function(event, i) {
       if (1 == this.status[i]) {
-        Vue.set(this.status, i, 0);
+        Vue.set(this.status, i, 2);
+        console.log("status==2吗？" + this.status[i]);
         clearTimeout(this.setTimeOutMouse[i]);
+        var self = this;
+        setTimeout(function() {
+          Vue.set(self.status, i, 0);
+        }, 500);
         this.hitMouseCount++;
         if (this.hitMouseCount < 11) {
           this.mouseSum = 1;
@@ -115,6 +193,14 @@ export default {
       //
       // }
     },
+    gameBegin: function() {
+      // alert("Game will begin!" + "\n" + "Let's start!");
+      // clearTimeout(this.timeOut);
+      this.missMouseCount = 0;
+      this.hitMouseCount = 0;
+      this.startGame = true;
+      this.mouseAppear();
+    },
     mouseAppear: function() {
       // 1.设置定时器，等待2s
       // 2.八个点随机一个
@@ -123,66 +209,79 @@ export default {
       // var locations = [1, 2, 3, 4, 5, 6, 7, 8];
       //Math.random():获取0~1随机数;Math.floor取整;
 
-      //实现老鼠数量随机
-
+      //生成随机的老鼠
       var locations = [];
       for (var i = 0; i < this.status.length; i++) {
         if (0 == this.status[i]) {
           locations.push(i + 1);
         }
       }
-      console.log("status:" + this.status);
-      console.log("locations:" + locations);
 
       var locationA = [];
       var sum = Math.floor(Math.random() * this.mouseSum + 1);
-      console.log("随机数sum：" + sum);
       for (let i = 0; i < sum; i++) {
         if (0 == locations.length) {
           break;
         }
         var locationIndex = Math.floor(Math.random() * locations.length);
         var location = locations[locationIndex];
-        console.log("我要减掉的location：" + location);
-        console.log("locations减之前:" + locations);
-        console.log("locations的INDEX：" + locationIndex);
         locations.splice(locationIndex, 1);
-        console.log("locations减之后:" + locations);
         locationA.push(location);
       }
-      console.log("locationA:" + locationA);
+
+      //生成随机的时间
       var self = this;
       var randomTime = Math.floor(
         Math.random() * (this.mouseTimeMax - this.mouseTimeMin + 1) +
           this.mouseTimeMin
       );
-      setTimeout(function() {
+
+      //让随机到的老鼠在随机的时间后冒头
+      self.timeOut = setTimeout(function() {
+        if (4 < self.missMouseCount) {
+          self
+            .$confirm(
+              "You lost too many mice! Do you want to play again?",
+              "warning",
+              {
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                type: "warning"
+              }
+            )
+            .then(() => {
+              self.$message({
+                type: "success",
+                message: "You can click ‘Start’ button to restart game~Come On~"
+              });
+            })
+            .catch(() => {
+              self.$message({
+                type: "info",
+                message: "You quit the game~",
+                methods: window.history.go(-1)
+              });
+            });
+          // self.$message("You lost too many mice! Let's play again");
+          // self.gameBegin();
+          self.missMouseCount = 0;
+          self.hitMouseCount = 0;
+          self.startGame = false;
+          return;
+        }
         for (let i = 0; i < locationA.length; i++) {
           Vue.set(self.status, locationA[i] - 1, 1);
-          console.log("第" + locationA[i] + "只老鼠出来了");
           self.setTimeOutMouse[locationA[i] - 1] = setTimeout(function() {
             //vue.set:让vue修改对象的属性值
             Vue.set(self.status, locationA[i] - 1, 0);
-            console.log("第" + locationA[i] + "只老鼠回去了");
+            if (self.startGame) {
+              self.missMouseCount++;
+            }
           }, 3000);
         }
-
         self.mouseAppear();
       }, randomTime);
-      console.log("随机的时间" + randomTime);
     }
-    // 地洞：
-    //    地洞的8个位置
-    // 老鼠：
-    //  1. 随机老鼠的位置
-    //  2. 老鼠的三种状态和动画：
-    //   （1）老鼠未出现
-    //   （2）老鼠上升到最高到下降
-    //   （3）老鼠被锤到并下降
-    //  3. 老鼠被锤到后，计数并显示
-    // 鼠标：
-    //  1.在背景图的div内就显示为锤子样式
-    //  2.点击鼠标左键时候，切换锤子样式，鼠标抬起后，换回样式
   }
 };
 </script>
@@ -211,7 +310,7 @@ export default {
 .mouseTop {
   height: 78px;
   width: 100%;
-  padding-top: 179px;
+  padding-top: 139px;
 }
 .mouseBottom {
   height: 78px;

@@ -4,6 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import Element from 'element-ui'
+
 import 'element-ui/lib/theme-chalk/index.css' //引入element样式
 
 
@@ -24,6 +25,7 @@ new Vue({
   components: {
     App
   },
+
   template: '<App/>'
   // render: h => h(App)
 })
